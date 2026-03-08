@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4">
+        <h3 class="text-center mb-4 text-muted sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-list-ul" style="font-size: 23px;"></i> Productos
+        </h3>
+
+        <!-- Mensaje de confirmación -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-custom-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Barra de Búsqueda -->
+        <form method="GET" class="mb-4">
+            <div class="input-group input-group-lg mb-3">
+                <input type="text" class="form-control rounded-start shadow-sm" name="q" value="{{ query }}" 
+                placeholder="Buscar por nombre" aria-label="Buscar por nombre">
+                <button class="btn btn-dark text-light rounded-end shadow-sm" type="submit" aria-label="Buscar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <!-- Botón para Crear -->
+        <div class="d-flex justify-content-start mb-3 mt-3">
+            <a href="{% url 'productoCrear' %}" class="btn btn-success shadow-sm px-3 py-2"> 
+                <i class="fa-solid fa-plus"></i>  Crear producto
+            </a>
+        </div>
+
+        <!-- Alerta de Bajo Stock  -->
+        {% if page_obj.number == 1 %}
+            {% for p in productos_bajo_stock %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>¡Alerta de Bajo Stock!</strong> El producto <strong>{{ p.nombre }}</strong> tiene una cantidad de <strong>{{ p.stock }}</strong> unidades.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="table-responsive shadow-sm rounded p-3 bg-white mb-4">
+            <table class="table align-middle">
+                <thead class="table-dark text-uppercase">
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Precio Unitario</th>
+                        <th>Stock</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr class="clickable-row" data-url="{% url 'productoDetalle' p.id %}">
+                        <td class="img-container">
+                            {% if p.imagen %}
+                                <img src="{{ p.imagen.url }}" alt="Imagen de {{ p.nombre }}" class="lista-imagen">
+                                <div class="img-preview"></div>
+                            {% endif %}
+                        </td>
+                        <td>{{ p.nombre }}</td>
+                        <td>${{ p.precio_unitario|floatformat:0 }}</td>
+                        <td>
+                            {% if p.stock < 5 %}
+                                <span class="badge bg-danger">Bajo stock</span>
+                            {% else %}
+                                {{ p.stock }}
+                            {% endif %}
+                        </td>
+                        <td>${{ p.total|default:0|floatformat:0 }}</td> <!-- Mostrar el total calculado -->
+                        <td>
+                            <a href="{% url 'productoEditar' p.id %}" class="btn btn-outline-dark btn-sm rounded-circle">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <form action="{% url 'productoEliminar' p.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle delete-btn"
+                                        onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav aria-label="Paginación">
+                 <ul class="pagination justify-content-center">
+                     {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page=1" aria-label="Primera">
+                                 <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link bg-black text-white border-black">
+                            {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Clic en una fila de la tabla -->
+    <script>
+        document.querySelectorAll('.clickable-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                window.location.href = row.getAttribute('data-url');
+            });
+        });
+    </script>
+
+    <style>
+        /* Contenedor de la imagen */
+        .img-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* Imagen normal */
+        .lista-imagen {
+            width: 50px; /* Ajusta según el tamaño deseado */
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Ampliación de la imagen al hacer hover */
+        .img-container:hover .lista-imagen {
+            transform: scale(2); /* Aumenta el tamaño */
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        
+        body {
+            background-image: url('/static/img/FondoListas.jpg'); /* Imagen de fondo */
+            background-size: contain; /* Ajusta la imagen al tamaño sin recortarla */
+            background-position: center; /* Centrar la imagen de fondo */
+            background-repeat: no-repeat; /* Evita que la imagen se repita */
+        }
+    </style>
+{% endblock %}

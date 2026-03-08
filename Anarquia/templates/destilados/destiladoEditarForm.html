@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4 container-spacing">
+        <h3 class="text-center mb-4 text-muted sticky-top p-2 text-dark" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-pen" style="font-size: 23px"></i> Editar Destilado
+        </h3>
+        <form action="{% url 'destiladoEditar' form.instance.pk %}" method="post" class="bg-white p-5 rounded shadow-lg">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-center mt-4">
+                <!-- Botón Guardar -->
+                <button type="submit" class="btn btn-icon m-2">
+                    <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                </button>
+            </div>
+        </form>
+        <!-- Formulario de eliminación -->
+        <div class="d-flex justify-content-center mt-4">
+            <form action="{% url 'destiladoEliminar' form.instance.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-icon m-2" onclick="return confirm('¿Estás seguro de que deseas eliminar este destilado?');">
+                    <i class="fa-solid fa-trash"></i>  <!-- Icono de tacho de basura -->
+                </button>
+            </form>
+            <!-- Botón Volver atrás -->
+            <a href="{% url 'destiladosLista' %}" class="btn btn-icon m-2">
+            <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+            </a>
+        </div>
+    </div>
+
+    
+{% endblock %}

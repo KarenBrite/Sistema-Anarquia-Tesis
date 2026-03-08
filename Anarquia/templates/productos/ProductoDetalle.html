@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4">
+        <h3 class="text-center mb-4 text-muted sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-circle-info"></i> Detalle de Producto
+        </h3>
+
+
+        <div class="row justify-content-center ">
+            <!-- Contenedor común para la imagen y la descripción con fondo sutil y bordes redondeados -->
+            <div class="col-md-8">
+                <div class="bg-white p-5 rounded shadow-lg">
+                    <div class="row">
+                        <!-- Columna izquierda con la imagen centrada -->
+                        <div class="col-md-5 d-flex justify-content-center align-items-center mb-3"> <!-- Reducido el margen inferior -->
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid rounded-3" style="max-width: 100%; height: auto; max-height: 400px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                            {% else %}
+                                <p>No hay imagen disponible</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Columna derecha con la información del producto -->
+                        <div class="col-md-7 d-flex flex-column justify-content-between">
+                            <h4 class="fw-bold mb-3 text-dark" style="font-size: 1.75rem;">{{ producto.nombre }}</h4>
+                            <p><i class="fa-solid fa-align-left"></i> <strong>Descripción:</strong> {{ producto.descripcion }}</p>
+                            <p><i class="fa-solid fa-dollar-sign"></i> <strong>Precio unitario:</strong> ${{ producto.precio_unitario }}</p>
+                            <p><i class="fa-solid fa-boxes-stacked"></i> <strong>Stock disponible:</strong> {{ producto.stock }}</p>
+                            <p><i class="fa-solid fa-wine-bottle"></i> <strong>Destilado:</strong> {{ producto.destilado.nombre }}</p>
+                            <p><i class="fa-solid fa-recycle"></i> <strong>Reutilizable:</strong> {{ producto.reutilizable|yesno:"Sí,No" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULARIOS PARA EDITAR Y ELIMINAR -->
+    <div class="d-flex justify-content-center mb-4">
+        <!-- Botón de Eliminar con confirmación -->
+        <form action="{% url 'productoEliminar' producto.id %}" method="post" class="me-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-icon m-2" 
+                    onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+            </button>
+        </form>
+        
+        <!-- Botón para Editar producto -->
+        <a href="{% url 'productoEditar' producto.id %}" class="btn btn-icon m-2">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+    </div>
+    
+    
+{% endblock %}

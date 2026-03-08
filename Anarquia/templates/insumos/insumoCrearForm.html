@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4 container-spacing">
+        <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-user-plus" style="font-size: 23px;"></i> Crear insumo
+        </h3>
+        <form action="{% url 'insumoCrear' %}" method="post" class="bg-white p-5 rounded shadow-lg">
+            {% csrf_token %}
+            {{form.as_p }}
+            <div class="form-group">
+                <div class="d-flex">
+                    <a href="{% url 'proveedorCrear' %}?next={{ request.path }}" class="btn btn-success ms-2">
+                        <i class="fa-solid fa-plus"></i> Crear Proveedor
+                    </a>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4 ">
+                <button type="submit" class="btn btn-icon m-2">
+                    <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                </button>
+                <a href="{% url 'insumosLista' %}" class="btn btn-icon m-2">
+                    <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+                </a>
+            </div>
+        </form>
+    </div>
+
+    
+
+{% endblock %}

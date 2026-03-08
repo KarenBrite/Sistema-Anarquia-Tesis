@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+{% now "Y-m-d" as today %}
+{% with today|date:"d/m/y" as now %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<div class="container mt-4">
+    <h3 class="text-center mb-4 text-muted sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-list-ul" style="font-size: 23px;"></i> Insumos
+    </h3>
+
+    <!-- Mensajes de confirmación -->
+    {% for message in messages %}
+        <div class="alert-custom-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Barra de Búsqueda -->
+    <form method="GET" class="mb-4">
+        <div class="input-group input-group-lg">
+            <input type="text" class="form-control rounded-start shadow-sm" name="q" value="{{ query }}" 
+            placeholder="Buscar por insumo" aria-label="Buscar por nombre o razón social">
+            <button class="btn btn-dark text-light" type="submit">
+                <i class="fa-solid fa-search"></i>
+            </button>
+        </div>
+    </form>
+
+    <!-- Botón para Crear -->
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'insumoCrear' %}" class="btn btn-success shadow-sm px-3 py-2"> 
+            <i class="fa-solid fa-plus"></i> Crear Insumo
+        </a>
+    </div>
+
+    <!-- Alertas -->
+    {% for insumo in insumos_vencidos %}
+        <div class="alert alert-danger alert-dismissible fade show">
+            <strong>¡Insumo Vencido!</strong> {{ insumo.insumo }} venció el {{ insumo.fecha_de_vencimiento|date:"d/m/y" }}.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% for insumo in insumos_poca_cantidad %}
+        <div class="alert alert-warning alert-dismissible fade show">
+            <strong>¡Bajo Stock!</strong> {{ insumo.insumo }} tiene {{ insumo.cantidad }} {{ insumo.unidad_medida }}.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <!-- Tabla de Insumos -->
+    <div class="table-responsive shadow-sm rounded p-3 bg-white">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark text-uppercase">
+                <tr>
+                    <th>Insumo</th>
+                    <th>Cantidad</th>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for insumo in insumos %}
+                <tr class="clickable-row" data-url="{% url 'insumoDetalle' insumo.id %}">
+                    <td>{{ insumo.insumo }}</td>
+                    <td>
+                        {% if insumo in insumos_poca_cantidad %}
+                            <span class="badge bg-danger">Bajo stock</span>
+                        {% else %}
+                            {{ insumo.cantidad }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if insumo.fecha_de_vencimiento %}
+                            {% if insumo.fecha_de_vencimiento|date:"d/m/y" < now %}
+                                <span class="badge bg-danger">Vencido</span>
+                            {% elif insumo.fecha_de_vencimiento|date:"d/m/y" <= now|add:"7" %}
+                                <span class="badge bg-warning text-dark">Por vencer</span>
+                            {% else %}
+                                {{ insumo.fecha_de_vencimiento|date:"d/m/y" }}
+                            {% endif %}
+                        {% else %}
+                            <i class="fa-solid fa-calendar-xmark" style="color: gray;" title="Sin Vencimiento"></i>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        <!-- Botón de Editar -->
+                        <a href="{% url 'insumoEditar' insumo.id %}" class="btn btn-outline-dark btn-sm rounded-circle">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+
+                        <!-- Botón de Eliminar -->
+                        <form action="{% url 'insumoEliminar' insumo.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle delete-btn" 
+                                    onclick="return confirm('¿Eliminar este insumo?');">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>                        
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link text-black" href="?page=1">&laquo;&laquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link text-black" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link bg-black text-white">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link text-black" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link text-black" href="?page={{ page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Script para hacer clic en la fila de la tabla y abrir el detalle -->
+<script>
+    document.querySelectorAll('.clickable-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+            window.location.href = row.getAttribute('data-url');
+        });
+    });
+</script>
+
+<style>
+    body {
+        background-image: url('{% static "img/FondoListas.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+</style>
+
+{% endblock %}
+{% endwith %}

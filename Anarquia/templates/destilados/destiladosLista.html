@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4">
+        <h3 class="text-center mb-4 text-muted sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-list-ul" style="font-size: 23px;"></i> Destilados
+        </h3>
+        
+        <!-- Mensaje de confirmacion de cambio -->
+        {% for message in messages %}
+        <div class="alert-custom-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    
+
+        <!-- Barra de Búsqueda y Filtros -->
+        <form method="GET" class="mb-4">
+            <div class="input-group input-group-lg mb-3">
+                <input type="text" class="form-control rounded-start shadow-sm" name="q" value="{{ query }}" placeholder="Buscar por nombre" aria-label="Buscar por nombre">
+                <button class="btn btn-dark text-light rounded-end shadow-sm" type="submit" aria-label="Buscar">
+                    <!--lupita svg-->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </button>
+            </div>
+        </form>
+        
+        <!-- Botón para Crear -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+            <a href="{% url 'destiladoCrear' %}" class="btn btn-success shadow-sm px-3 py-2"> <i class="fa-solid fa-plus"></i> Crear Destilado</a>
+        </div>
+    
+        <!-- Tabla de destilados -->
+        <div class="table-responsive shadow-sm rounded p-3 bg-white mb-4">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark text-uppercase">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Edición Limitada</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for destilado in destilados %}
+                    <tr>
+                        <td>{{ destilado.nombre }}</td>
+                        <td>{{ destilado.edicionlimitada|yesno:"Sí,No" }}</td>
+                        <td>
+                            <!-- Botón de Editar -->
+                            <a href="{% url 'destiladoEditar' destilado.id %}" class="btn btn-outline-dark btn-sm rounded-circle">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            
+                            <!-- Botón de Eliminar -->
+                            <form action="{% url 'destiladoEliminar' destilado.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle delete-btn" 
+                                        onclick="return confirm('¿Estás seguro de que deseas eliminar este destilado?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Paginación -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page=1" aria-label="Primera">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+        
+                    <li class="page-item active">
+                        <span class="page-link bg-black text-white border-black">
+                            {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+        
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-black" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- clic en una fila de la tabla -->
+    <script>
+        // Agregar evento click a las filas de la tabla con la clase 'clickable-row'
+        document.querySelectorAll('.clickable-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                window.location.href = row.getAttribute('data-url');
+            });
+        });
+    </script>
+    <style>
+        body {
+            background-image: url('/static/img/FondoListas.jpg'); /* Imagen de fondo */
+            background-size: contain; /* Ajusta la imagen al tamaño sin recortarla */
+            background-position: center; /* Centrar la imagen de fondo */
+            background-repeat: no-repeat; /* Evita que la imagen se repita */
+        }
+    </style>
+{% endblock %}

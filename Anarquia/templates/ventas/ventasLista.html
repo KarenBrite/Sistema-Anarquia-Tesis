@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<div class="container mt-4">
+    <h3 class="text-muted mb-4 text-center sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-list-ul" style="font-size: 23px;"></i> Ventas
+    </h3>
+
+    {% for message in messages %}
+    <div class="alert-custom-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+
+<!-- Formulario de Filtros y Búsqueda -->
+<form method="GET" class="mb-4">
+    <!-- Barra de búsqueda -->
+    <div class="row mb-3">
+        <div class="col-12 mb-3 mb-md-0">
+            <div class="input-group input-group-lg">
+                <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm rounded-medium shadow-sm" placeholder="Buscar por ID o Cliente">
+                <button class="btn btn-dark text-light rounded-end shadow-sm" type="submit" aria-label="Buscar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros debajo de la barra de búsqueda -->
+    <div class="row mb-3">
+        <!-- Botón Nueva Venta alineado a la izquierda -->
+        <div class="col-12 col-md-4 mb-2">
+            <a href="{% url 'ventaCrear' %}" class="btn btn-success shadow-sm px-3 py-2">
+                <i class="fa-solid fa-plus"></i> Nueva Venta
+            </a>
+        </div>
+
+        <!-- Filtros alineados a la derecha -->
+        <div class="col-12 col-md-8 d-flex justify-content-end">
+            <!-- Filtro de estado -->
+            <div class="col-4 col-md-4 col-lg-4 mb-2">
+                <select name="filtro" class="form-select form-select-sm rounded-medium shadow-sm" onchange="this.form.submit()">
+                    <option value="no" {% if filtro == 'no' %}selected{% endif %}>No Anuladas</option>
+                    <option value="si" {% if filtro == 'si' %}selected{% endif %}>Anuladas</option>
+                    <option value="todas" {% if filtro == 'todas' %}selected{% endif %}>Todas</option>
+                </select>
+            </div>
+
+            <!-- Filtro de Mes -->
+            <div class="col-4 col-md-4 col-lg-4 mb-2">
+                <select name="filtro_fecha" class="form-select form-select-sm rounded-medium shadow-sm" onchange="this.form.submit()">
+                    <option value="todas" {% if filtro_fecha == 'todas' %}selected{% endif %}>Todas</option>
+                    <option value="ultimos_7" {% if filtro_fecha == 'ultimos_7' %}selected{% endif %}>Últimos 7 días</option>
+                    {% for num, nombre in meses %}
+                        <option value="{{ num }}" {% if filtro_fecha == num|stringformat:"i" %}selected{% endif %}>{{ nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Filtro de Año -->
+            <div class="col-3 col-md-2 col-lg-2 mb-2">
+                <select name="filtro_anio" class="form-select form-select-sm rounded-medium shadow-sm" onchange="this.form.submit()">
+                    {% for año in años_disponibles %}
+                        <option value="{{ año }}" {% if filtro_anio == año|stringformat:"i" %}selected{% endif %}>{{ año }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+    <!-- Tabla de Ventas -->
+    <div class="table-responsive shadow-sm rounded p-3 bg-white mb-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark text-uppercase">
+                <tr>
+                    <th>Id Venta</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Anulado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in venta %}
+                <tr class="clickable-row" data-url="{% url 'ventaDetalle' v.id %}">
+                    <td>{{ v.id }}</td>
+                    <td>{{ v.fecha }}</td>
+                    <td>{{ v.id_cliente }}</td>
+                    <td>
+                        {% if v.anulado %}
+                        <span class="badge bg-danger text-light d-flex align-items-center">
+                            <i class="fa-solid fa-circle-xmark me-2"></i> Sí
+                        </span>
+                    {% else %}
+                        <span class="badge bg-success text-light d-flex align-items-center">
+                            <i class="fa-solid fa-circle-check me-2"></i> No
+                        </span>
+                    {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'ventaEditar' v.id %}" class="btn btn-outline-dark btn-sm rounded-circle" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a href="{% url 'generar_factura' v.id %}" class="btn btn-outline-danger btn-sm rounded-circle" title="Descargar PDF">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+        <nav aria-label="Paginación">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link text-black" href="?page=1&q={{ query }}&filtro={{ filtro }}&filtro_fecha={{ filtro_fecha }}" aria-label="Primera">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link text-black" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&filtro={{ filtro }}&filtro_fecha={{ filtro_fecha }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link bg-black text-white border-black">
+                        {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link text-black" href="?page={{ page_obj.next_page_number }}&q={{ query }}&filtro={{ filtro }}&filtro_fecha={{ filtro_fecha }}" aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link text-black" href="?page={{ page_obj.paginator.num_pages }}&q={{ query }}&filtro={{ filtro }}&filtro_fecha={{ filtro_fecha }}" aria-label="Última">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".clickable-row").forEach(row => {
+            row.addEventListener("click", function () {
+                const url = this.getAttribute("data-url");
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    body {
+        background-image: url('/static/img/FondoListas.jpg');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .rounded-medium {
+    border-radius: 5px;  /* Bordes suavemente redondeados */
+    padding: 10px 15px;  /* Espaciado interno ajustado */
+    box-shadow: none;     /* Elimina la sombra si no quieres una sombra en el borde */
+    }
+</style>
+{% endblock %}

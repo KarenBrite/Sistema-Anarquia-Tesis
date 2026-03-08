@@ -1,0 +1,96 @@
+
+
+/* Personalizar los mensajes de confirmacion*/
+.alert-custom-info {
+    background-color: rgba(33, 150, 243, 0.1); /* Azul con transparencia */
+    color: #1565C0; /* Azul oscuro para el texto */
+    border: 1px solid #1565C0; /* Borde azul nítido */
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Mensaje de éxito (verde con transparencia) */
+.alert-custom-success {
+    background-color: rgba(76, 175, 80, 0.1); /* Verde con transparencia */
+    color: #2E7D32; /* Verde oscuro para el texto */
+    border: 1px solid #2E7D32; /* Borde verde nítido */
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Mensaje de éxito en eliminación */
+.alert-custom-error {
+    background-color: rgba(255, 0, 0, 0.1); /* Rojo con transparencia */
+    color: #D32F2F; /* Rojo oscuro para el texto */
+    border:1px solid #D32F2F; /* Borde rojo nítido */
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+
+
+/* Estilo del contenedor para mantener una separación adecuada del pie de página */
+.container {
+    padding-bottom: 3rem; /* Espacio adicional en la parte inferior del contenedor */
+    margin-top: 1.5rem;
+}
+/* Espaciado entre campos de formulario */
+.form-group {
+    margin-bottom: 1.5rem; /* Espaciado inferior entre campos del formulario */
+}
+.edit-form {
+    background-color: #ffffff; /* Fondo blanco limpio */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #333;
+}
+
+.form-check-label {
+    font-size: 14px;
+    color: #555;
+}
+
+.btn-icon {
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #000;
+    transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+    background-color: #000;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.btn-icon i {
+    pointer-events: none;
+}
+
+.input-group button {
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.form-check label i {
+    color: #000; /* Tacho de basura en negro */
+}

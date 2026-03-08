@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+
+<div class="container mt-4 container-spacing">
+    <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-plus" style="font-size: 23px;"></i> Crear Venta
+    </h3>
+    <form  method="post" class="bg-white p-5 rounded shadow-lg">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <h3>Productos</h3>
+        {{ ventaFormset.management_form }}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark text-uppercase">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in ventaFormset %}
+                    <tr>
+                        <td>{{ v.id_producto }}</td>
+                        <td>{{ v.cantidad}}</td>
+                        <td>{{ v.precio_unitario}}</td>
+                        <td>{{ v.subtotal}}</td>
+                    
+                        {{ v.id_venta }}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mostrar el subtotal, descuento y el total de la venta -->
+        <div class="mt-3">
+            <p><strong>Subtotal: $<span id="total-subtotal">0.00</span></strong></p>
+            <p><strong>Total Venta: $<span id="total-venta">0.00</span></strong></p>
+        </div>
+
+
+        <!-- Botón para enviar el formulario -->
+        <div class="mt-4 d-flex justify-content-center">
+            <button type="submit" class="btn btn-icon m-2" >
+                <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+            </button>
+            <a href="{% url 'ventasLista' %}" class="btn btn-icon m-2">
+                <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+            </a>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    function actualizarSubtotal() {
+        let totalVenta = 0;
+        let porcentajeDescuento = parseFloat(document.getElementById('descuento').value) || 0;
+        let totalDescuento = 0;
+        let totalSubtotal = 0;
+        let cantidadTotal = 0;
+
+        const subtotales = document.querySelectorAll('.subtotal');
+        const cantidades = document.querySelectorAll('.cantidad');
+        const preciosUnitarios = document.querySelectorAll('.precio-unitario');
+
+        subtotales.forEach(function(subtotal, index) {
+            const cantidad = parseInt(cantidades[index].value || 0);  // Obtiene la cantidad (o 0 si no se pone nada)
+            const precioUnitario = parseFloat(preciosUnitarios[index].value || 0);  // Obtiene el precio unitario (o 0 si no se pone nada)
+
+            // Calcula el subtotal de cada fila
+            let subtotalValue = cantidad * precioUnitario;
+
+            // Actualiza el valor del subtotal de la fila
+            subtotal.value = subtotalValue.toFixed(2);
+
+            // Acumula el total de subtotales y cantidad total
+            totalSubtotal += subtotalValue;
+            cantidadTotal += cantidad; // Acumula todas las cantidades
+        });
+
+        // Calcula el total descuento
+        totalDescuento = totalSubtotal * porcentajeDescuento /100
+       
+        // Calcula el total de la venta
+        totalVenta = totalSubtotal - totalDescuento;
+
+        // Actualiza los valores en la interfaz
+        document.getElementById('total-subtotal').textContent = totalSubtotal.toFixed(2);
+       // document.getElementById('total-descuento').textContent = totalDescuento.toFixed(2);
+        document.getElementById('total-venta').textContent = totalVenta.toFixed(2);
+        document.getElementById('total').value = totalVenta.toFixed(2);
+        document.getElementById('total').value = document.getElementById('total').value.replace(',', '.') ;
+   }
+
+// Lista de productos con sus precios (recibida desde Django)
+//const productos = {{ productos|safe }};  
+const productos = JSON.parse('{{ productos|safe }}');  
+
+
+function cargarPrecio(elemento) {
+    // Encuentra la fila donde está el select del producto
+    let fila = elemento.closest("tr");
+    
+    // Obtiene el ID del producto seleccionado
+    let idProducto = elemento.value;
+    
+    // Encuentra el campo de precio unitario en la misma fila
+    let precioUnitarioInput = fila.querySelector(".precio-unitario");
+
+    let precio = productos[idProducto].toFixed(2);
+    
+    precioUnitarioInput.value = precio;
+  
+    // Llamar a la función de actualización de subtotal
+    actualizarSubtotal();
+}
+
+
+</script>
+
+
+{% endblock %}
+

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<div class="container mt-4 container-spacing">
+    <h3 class="text-muted mb-4 text-center sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-circle-info" style="font-size: 23px;"></i> Detalle Cliente
+    </h3>
+    <div class="bg-white p-5 rounded shadow-lg">
+        <div class="card-body">
+            <h5 class="mb-3">{{ cliente.nombre }}</h5>
+            <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+            <p><strong>Email:</strong> {{ cliente.email }}</p>
+            <p><strong>Instagram:</strong> <a href="{{ cliente.instagram }}" target="_blank">{{ cliente.instagram }}</a></p>
+            <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+            <p><strong>Código Postal:</strong> {{ cliente.codPostal }}</p>
+            <p><strong>Provincia:</strong> {{ cliente.provincia.nombre }}</p>
+            <p><strong>Tipo de Cliente:</strong> {{ cliente.get_tipo_cliente_display }}</p>
+            <p><strong>Razón Social:</strong> {{ cliente.razon_social|default:"No disponible" }}</p>
+            <p><strong>Cliente Mayorista:</strong> {{ cliente.cliente_mayorista|yesno:"Sí,No" }}</p>
+            <p><strong>Punto de Venta:</strong> {{ cliente.punto_venta|yesno:"Sí,No" }}</p>
+            <p><strong>Fecha de Registro:</strong> {{ cliente.fecha }}</p>
+
+            <!-- Aquí incluimos la lista de ventas -->
+            <h4 class="mt-4"><i class="fa-solid fa-file-invoice-dollar"></i> Ventas</h4>
+            <table class="table table-striped">
+                <thead class="table-dark text-uppercase">
+                    <tr>
+                        <th>ID Factura</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'ventaDetalle' venta.id %}" class="venta-link">
+                                {{ venta.id }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'ventaDetalle' venta.id %}" class="venta-link">
+                                {{ venta.fecha }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'ventaDetalle' venta.id %}" class="venta-link">
+                                ${{ venta.total }}
+                            </a>
+                        </td>
+                        <td>
+                            <!-- Icono de previsualización (lupa) -->
+                            <a href="{% url 'ventaDetalle' venta.id %}" class="btn btn-outline-dark btn-sm rounded-circle" title="Previsualizar">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <!-- Icono de descarga (documento) -->
+                            <a href="{% url 'generar_factura' venta.id %}" class="btn btn-outline-danger btn-sm rounded-circle" title="Descargar PDF">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay facturas para este cliente.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FORMULARIOS PARA EDITAR Y ELIMINAR -->
+    <div class="d-flex justify-content-center mt-4">
+        <!-- Botón de Eliminar con confirmación -->
+        <form action="{% url 'clienteEliminar' cliente.id %}" method="post" class="me-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-icon m-2"
+                    onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');">
+                <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+            </button>
+        </form>
+
+        <!-- Botón para Editar cliente -->
+        <a href="{% url 'clienteEditar' cliente.id %}" class="btn btn-icon m-2">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+    .venta-link {
+        color: inherit;          /* Hereda el color del texto del elemento padre */
+        text-decoration: none;   /* Elimina el subrayado */
+    }
+</style>
+
+{% endblock %}

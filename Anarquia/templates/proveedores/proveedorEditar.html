@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+ 
+    <div class="container mt-4 container-spacing">
+        <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-pen" style="font-size: 22px;"></i> Editar Proveedor</h3>
+        <form action="{% url 'proveedorEditar' proveedor.id %}" method="post" class="bg-white p-5 rounded shadow-lg">
+            
+            
+            {% csrf_token %}
+            {% if error_message %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+            
+            <div class="form-group" >
+                <label for="nombre">Nombre:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ proveedor.nombre }}" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" value="{{ proveedor.telefono }}" required>
+            </div>
+            <div class="form-group">
+                <label for="direccion">Dirección:</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ proveedor.direccion }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ proveedor.email }}" required>
+            </div>
+            <div class="form-group">
+                <h3>Insumos de este proveedor:</h3>
+                    <ul>
+                        {% for insumo in proveedor.insumos.all %}
+                            <li>{{ insumo.insumo }} - ${{ insumo.precio }}</li>
+                        {% empty %}
+                            <li>Este proveedor no tiene insumos asignados.</li>
+                        {% endfor %}
+                    </ul>
+            </div>
+
+
+            <!-- Botones -->
+            <div class="mt-4 d-flex justify-content-center">
+                <button type="submit" class="btn btn-icon m-2">
+                    <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                </button>
+            </div>
+        </form>
+        <div class="mt-4 d-flex justify-content-center">
+            <!-- Botón de Eliminar con confirmación -->
+            <form action="{% url 'proveedorEliminar' proveedor.id %}" method="post" class="me-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-icon m-2" 
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este proveedor?');">
+                    <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+                </button>
+            </form>
+            <a href="{% url 'proveedoresLista' %}" class="btn btn-icon m-2">
+                <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+            </a>
+        </div>
+    </div>
+
+   
+{% endblock %}

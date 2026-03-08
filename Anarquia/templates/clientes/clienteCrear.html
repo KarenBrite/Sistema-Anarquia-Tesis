@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4 container-spacing">
+        <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-user-plus" style="font-size: 23px;"></i> Crear Cliente
+        </h3>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% if error_message %}
+            <p style="color:red;">{{ error_message }}</p>
+            {% endif %}
+            <div class="bg-white p-5 rounded shadow-lg"> 
+                <div class="form-group mb-3">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="tipo_cliente">Tipo de Cliente:</label>
+                    <select class="form-control" id="tipo_cliente" name="tipo_cliente">
+                        <option value="C">Consumidor Final</option>
+                        <option value="R">Responsable Inscripto</option>
+                        <option value="M">Monotributista</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="razon_social">Razón Social:</label>
+                    <input type="text" class="form-control" id="razon_social" name="razon_social">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" class="form-control" id="direccion" name="direccion">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="cliente_mayorista">Cliente Mayorista:</label>
+                    <input type="checkbox" class="form-check-input" id="cliente_mayorista" name="cliente_mayorista">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="punto_venta">Punto de Venta:</label>
+                    <input type="checkbox" class="form-check-input" id="punto_venta" name="punto_venta">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="codPostal">Código Postal:</label>
+                    <input type="number" class="form-control" id="codPostal" name="codPostal" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="instagram">Instagram:</label>
+                    <input type="url" class="form-control" id="instagram" name="instagram">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="provincia">Provincia:</label>
+                    <select class="form-control" id="provincia" name="provincia">
+                        <option value="">-- Seleccione una provincia --</option>
+                        {% for provincia in provincias %}
+                        <option value="{{ provincia.id }}">{{ provincia.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="d-flex justify-content-center mt-4 ">
+                    <button type="submit" class="btn btn-icon m-2">
+                        <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                    </button>
+                    <a href="{% url 'clientesLista' %}" class="btn btn-icon m-2">
+                        <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+                    </a>
+                </div>
+        </form>
+    </div>
+  
+
+
+{% endblock %}

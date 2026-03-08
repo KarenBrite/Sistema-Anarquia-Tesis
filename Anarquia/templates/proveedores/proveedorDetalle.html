@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4 container-spacing">
+        <!-- Centrar el encabezado -->
+        <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-circle-info" style="font-size: 23px;"></i> Detalle del Proveedor</h3>
+        
+        <div class="bg-white p-5 rounded shadow-lg">
+            <div class="card-body">
+                <h5 class="mb-3">{{ proveedor.nombre }}</h5>
+                <p><strong>Teléfono:</strong> {{ proveedor.telefono }}</p>
+                <p><strong>Email:</strong> {{ proveedor.email }}</p>
+                <p><strong>Dirección:</strong> {{ proveedor.direccion }}</p>
+                <p><strong>Insumos:</strong></p>
+                <ul>
+                    {% for insumo in proveedor.insumos.all %}
+                        <li>{{ insumo.insumo }} (Cantidad: {{ insumo.cantidad }}, Precio: {{ insumo.precio }})</li>
+                    {% empty %}
+                        <li>No hay insumos asociados a este proveedor.</li>
+                    {% endfor %}
+                </ul>
+                
+               <!-- Aquí incluimos la lista de compras -->
+               <h4 class="mt-4"><i class="fa-solid fa-file-invoice-dollar"></i></h4>
+               <table class="table table-striped">
+                   <thead class="table-dark text-uppercase">
+                       <tr>
+                           <th>ID Factura</th>
+                           <th>Fecha</th>
+                           <th>Total</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                       {% for compra in compras %}
+                       <tr>
+                           <td>
+                               <a href="{% url 'compraDetalle' compra.id %}" class="compra-link">
+                                   {{ compra.id }}
+                               </a>
+                           </td>
+                           <td>
+                               <a href="{% url 'compraDetalle' compra.id %}" class="compra-link">
+                               {{ compra.fecha }}
+                               </a>
+                           </td>
+                           <td>
+                               <a href="{% url 'compraDetalle' compra.id %}" class="compra-link">
+                               {{ compra.total }}
+                               </a>
+                           </td>
+                       </tr>
+                       {% empty %}
+                       <tr>
+                           <td colspan="3">No hay facturas para este proveedor.</td>
+                       </tr>
+                       {% endfor %}
+                   </tbody>
+               </table>
+            </div>
+        </div>
+    </div>
+    <!-- FORMULARIOS PARA EDITAR Y ELIMINAR -->
+    <div class="d-flex justify-content-center mb-4">
+        <!-- Botón de Eliminar con confirmación -->
+        <form action="{% url 'proveedorEliminar' proveedor.id %}" method="post" class="me-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-icon m-2" 
+                    onclick="return confirm('¿Estás seguro de que deseas eliminar este proveedor?');">
+                <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+            </button>
+        </form>
+        
+        <!-- Botón para Editar  -->
+        <a href="{% url 'proveedorEditar' proveedor.id %}" class="btn btn-icon m-2">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+    </div>
+
+    <style>
+        .compra-link {
+            color: inherit;          /* Hereda el color del texto del elemento padre */
+            text-decoration: none;   /* Elimina el subrayado */
+        }
+        
+    
+    </style>
+
+{% endblock %}

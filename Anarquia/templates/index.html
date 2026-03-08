@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script>
+        window.onload = function() {
+            // Verificar si el usuario no está logueado y si es su primer acceso
+            {% if not request.user.is_authenticated and request.session.first_visit %}
+                Swal.fire({
+                    title: '',
+                    html: `
+                        <div class="swal-content">
+                            <img src="{% static 'img/Logo2.png' %}" alt="Logo de Anarquía Gin" class="swal-logo">
+                            <p class="swal-title">¿Eres mayor de 18 años?</p>
+                            <p class="swal-subtitle">Tenés que ser mayor de edad para ingresar a nuestro sitio</p>
+                            <div class="d-flex justify-content-center mt-4">
+                                <a href="javascript:void(0);" class="btn swal-btn me-3" id="btnYes">
+                                    <i class="fa-solid fa-check"></i> Sí
+                                </a>
+                                <a href="https://www.google.com" class="btn swal-btn" id="btnNo">
+                                    <i class="fa-solid fa-times"></i> No
+                                </a>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    background: 'url("{% static 'img/FondoInicio.jpg' %}") center center no-repeat',
+                    backdrop: 'rgba(0, 0, 0, 0.8)',
+                    color: '#000',
+                    padding: '0',
+                    customClass: {
+                        popup: 'full-screen-popup'
+                    },
+                    didOpen: () => {
+                        Swal.getPopup().style.transition = "opacity 1s ease-in-out";
+                        Swal.getPopup().style.opacity = "1";
+                    }
+                });
+    
+                document.getElementById('btnYes').addEventListener('click', function() {
+                    Swal.close();
+                    document.getElementById('main-content').style.display = 'block';
+                });
+            {% endif %}
+        };
+    </script>
+    
+
+    <div class="main-background" id="main-content">
+        <div class="overlay"></div>
+        
+        
+            <!-- Logo a la izquierda -->
+            <div class="logo-container">
+                <img src="{% static 'img/Montana.png' %}" alt="Logo de Anarquía Gin" class="logo">
+            </div>
+
+            <!-- Texto alineado a la izquierda y debajo del logo -->
+            <div class="text-left">
+                <h1 class="main-title">Un gin inspirado <br> en las sierras cordobesas</h1>
+                <p class="subtitle-text">
+                    Creado en el corazón de Traslasierra, elaborado con agua pura del nacimiento del río Mina Clavero. <br> Un gin único, intenso y auténtico, que al probarlo te hace sentir y saborear el alma de nuestras sierras.
+                </p>
+            </div>
+
+    </div>
+
+
+    <!-- Resto del contenido -->
+    <section class="container py-5">
+        <!-- Sección de La Creación de un Gin Auténtico -->
+        <section class="container-fluid py-5" style="background-color: #f4f4f4;">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    <h2 class="display-4" style="font-family: 'Poppins', sans-serif; color: #000; font-weight: normal;">
+                        LA CREACIÓN DE UN <span style="font-family: 'Poppins', sans-serif; font-weight: bold; color: #000;">GIN AUTÉNTICO</span>
+                    </h2>
+                    <p style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; color: #555; max-width: 800px; margin: 20px auto;">
+                        En Anarquía Gin, nos apasiona crear un gin auténtico, utilizando botánicos seleccionados, tanto de nuestros propios cultivos como cosechados en el Valle. 
+                        Con un fuerte compromiso con el medio ambiente, hemos optado por botellas de vidrio reutilizado y ofrecemos el servicio de botella recargable, contribuyendo así a reducir el impacto ambiental. Cada destilado es el reflejo de nuestra dedicación a la calidad, la naturaleza y la sostenibilidad.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+         <!-- Sección Servicios con video -->
+         <div class="row align-items-center mt-0" style="background-color: #f4f4f4; color: black; height: 100vh; margin: 0;">
+            <div class="col-12 text-center" style="position: relative; height: 100%;">
+                <video id="branding-video" width="100%" height="100%" autoplay muted>
+                    <source src="{% static 'img/Servicios.mp4' %}" type="video/mp4">
+                    Tu navegador no soporta la etiqueta de video.
+                </video>
+            </div>
+        </div>
+
+        <script>
+            // Pausar el video después de que se termine de reproducir
+            const video = document.getElementById('branding-video');
+            video.onended = function() {
+                video.pause(); // Pausa el video al final
+            };
+        </script>
+
+        <section class="productos container">
+            <div class="row align-items-center">
+                <!-- Columna izquierda con texto y botón -->
+                <div class="col-md-4 text-start">
+                    <h1 class="titulo-producto">NUESTRO <span class="destacado"> GIN</span> </h1>
+            
+                    <img src="{% static 'img/Producto1.jpg' %}" class="img-fluid mt-3 rounded" alt="Producto 1">
+                </div>
+                
+                <!-- Imagen central más grande -->
+                <div class="col-md-4">
+                    <img src="{% static 'img/Producto2.jpg' %}" class="img-fluid rounded shadow-lg" alt="Producto 2">
+                </div>
+        
+                <!-- Columna derecha con imagen y texto -->
+                <div class="col-md-4 text-end">
+                    <img src="{% static 'img/Producto3.jpg' %}" class="img-fluid rounded" alt="Producto 3">
+                    <h2 class="titulo-producto mt-3"> CONTAMOS CON <span class="destacado"> MÁS DE 7 </span> DESTILADOS</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Branding con video -->
+        <div class="row align-items-center mt-0" style="background-color: #f4f4f4; color: black; height: 100vh; margin: 0;">
+            <div class="col-12 text-center" style="position: relative; height: 100%;">
+                <video id="branding-video" width="100%" height="100%" autoplay muted>
+                    <source src="{% static 'img/Branding.mp4' %}" type="video/mp4">
+                    Tu navegador no soporta la etiqueta de video.
+                </video>
+            </div>
+        </div>
+
+        <script>
+            // Pausar el video después de que se termine de reproducir
+            const video = document.getElementById('branding-video');
+            video.onended = function() {
+                video.pause(); // Pausa el video al final
+            };
+        </script>
+
+       <!-- Sección sobre nuestra historia -->
+       <section class="container-fluid py-5" style="background-color: #f4f4f4;">
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <h2 class="display-4" style="font-family: 'Poppins', sans-serif; color: #000; font-weight: normal;">
+                    NUESTRA <span style="font-family: 'Poppins', sans-serif; font-weight: bold; color: #000;"> HISTORIA</span>
+                </h2>
+                <p style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; color: #555; max-width: 800px; margin: 20px auto;">
+                    <b>Somos Anarquía, un gin único que nace de la pureza de las sierras cordobesas.</b><br>
+                    Anarquía nació en Mina Clavero, Córdoba, Argentina en 2022. Somos el resultado de la pasión de dos locos amantes del gin que decidieron innovar y crear un producto único, dándole el sabor inconfundible de nuestro valle. Desarrollamos un producto en donde utilizamos agua de vertientes del nacimiento del río mina clavero y botánicos de la zona.
+                </p>
+            </div>
+        </div>
+    </section>
+
+        <!-- Sección sobre nuestro comienzo -->
+        <section class="historia-anarquia">
+            <div class="historia-contenido">
+                <div class="historia-texto">
+                    <h2 class="display-4" style="font-family: 'Poppins', sans-serif; color: #000; font-weight: normal;">
+                    NUESTRO <span style="font-family: 'Poppins', sans-serif; font-weight: bold; color: #000;"> COMIENZO</span>
+                    </h1>
+                    <p class="descripcion-historia">
+                        <b>Todo comenzó aquí. Nuestra primera botella</b><br> 
+                        Que no solo marcó el inicio de Anarquía, sino que impulsó el deseo de crear cada botella para acercarte a lo más puro de la naturaleza, 
+                        capturando la frescura única que brota del suelo de nuestro valle.  
+                        
+                        Nuestra aventura comenzó con unas pocas botellas de gin, pero hoy Anarquía se ha convertido en un símbolo de calidad que representa a Traslasierra. Nuestra dedicación a capturar la esencia única de nuestras sierras nos ha permitido llevar el espíritu de Mina Clavero a rincones de todo el país.  
+                        
+                    </p>
+                    <a href="https://www.instagram.com/anarquiagin_ar/" target="_blank" class="btn-instagram">
+                        Descubre Más
+                    </a>
+                </div>
+        
+                <div class="historia-imagen">
+                    <img src="{% static 'img/PrimeraEdicion.jpg' %}" alt="Primera edición de Anarquía Gin" class="img-fluid">
+                </div>
+            </div>
+        </section>
+        
+
+<!-- Sección de Presencia en Argentina -->
+<section class="bg-light py-5 text-center">
+    <h2 class="mb-4">Presencia en Argentina</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="icono-seccion">
+                <i class="bi bi-shop-window fs-1"></i> <!-- Icono de tienda -->
+                <h3>+25</h3>
+                <p>Puntos de venta</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="icono-seccion">
+                <i class="bi bi-cup-straw fs-1"></i> <!-- Icono de trago -->
+                <h3>+15</h3>
+                <p>Bares donde estamos presentes</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="icono-seccion">
+                <i class="bi bi-airplane-engines fs-1"></i> <!-- Icono de avión -->
+                <h3>Envíos</h3>
+                <p>A todo el país</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+
+
+.swal-content { text-align: center; color: #000; }
+        .swal-logo { width: 200px; height: auto; margin-bottom: 20px; filter: invert(1); }
+        .swal-title, .swal-subtitle { font-size: 2rem; text-transform: uppercase; margin-bottom: 20px; }
+        .full-screen-popup { width: 100vw; height: 100vh; background-size: cover; display: flex; justify-content: center; align-items: center; font-family: 'Poppins', sans-serif; }
+        .swal-btn { border-radius: 50px; padding: 10px 20px; transition: all 0.3s ease; }
+        .swal-btn:hover { background: #333; color: white; }
+       
+        .main-background {
+            background-image: url("/static/img/FondoIndex.jpg");
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center; /* Centra verticalmente los elementos */
+            justify-content: flex-start; /* Alinea los elementos a la izquierda */
+            color: white;
+            position: relative;
+        }
+
+        /*.main-content {
+            position: relative;
+            z-index: 2;
+            display: none;
+            text-align: left;
+        }*/
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        
+        .logo-container {
+            position: absolute;
+            top: 8%;
+            left: 5%;
+            z-index: 2;
+            margin-bottom: 20px; /* Añadir espacio entre el logo y el texto */
+            }
+        
+        .text-left {
+            position: absolute;
+            left: 5%;
+            top: 50%;  /* Ajusta el texto más abajo */
+            transform: translateY(-50%);
+            padding: 30px;
+            text-align: left;
+            z-index: 3;
+            margin-top: 20px;  /* Añadir espacio entre el logo y el texto */
+        }
+       
+        .logo {
+                width: 350px; /* Reducir tamaño del logo en pantallas medianas */
+            }
+
+        .main-title {
+            font-size: 3.2rem; /* Reducir tamaño del título en pantallas medianas */
+            text-transform: uppercase;
+            }
+
+        .subtitle-text {
+            font-size: 1.2rem; /* Reducir tamaño del subtítulo en pantallas medianas */
+        }
+        
+        
+        /*.main-content h1 {
+            font-size: 3rem;
+        }
+        .main-content p {
+            font-size: 1.5rem;
+        }*/
+
+    
+
+        /* Ajustes para pantallas más pequeñas */
+        @media (max-width: 1024px) {
+            .logo {
+                width: 350px; /* Reducir tamaño del logo en pantallas medianas */
+            }
+
+            .main-title {
+                font-size: 3rem; /* Reducir tamaño del título en pantallas medianas */
+            }
+
+            .subtitle-text {
+                font-size: 1rem; /* Reducir tamaño del subtítulo en pantallas medianas */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                width: 250px; /* Reducir aún más el tamaño del logo en pantallas pequeñas */
+            }
+
+            .main-title {
+                font-size: 2.5rem; /* Reducir aún más el tamaño del título */
+            }
+
+            .subtitle-text {
+                font-size: 0.9rem; /* Reducir aún más el tamaño del subtítulo */
+            }
+        }   
+        /* Productos */
+        .productos {
+            padding: 50px 0;
+        }
+
+        .titulo-producto {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #121212;
+            text-transform: uppercase;
+        }
+
+        .destacado {
+            font-weight: 700;
+            color: #000; /* negro */
+        }
+
+  
+        img {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .shadow-lg {
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+
+        /* NUESTRA HISTORIA - DISEÑO MODERNO CON IMAGEN DE FONDO */
+        .historia-anarquia {
+            background: url("{% static 'img/FondoListas.jpg' %}") no-repeat center center/cover;
+            padding: rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Contenido */
+        .historia-contenido {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 3rem;
+            padding: 2rem;
+        }
+
+        /* Título */
+        .titulo-historia {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 3.2rem;
+            color: #000000;
+            margin-bottom: 1rem;
+        }
+
+        .destacado {
+            color: #000;
+        }
+
+        /* Descripción */
+        .descripcion-historia {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            color: #222222;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Caja de Texto */
+        .historia-texto {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            color: #000000;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Imagen más grande */
+        .historia-imagen {
+            text-align: center;
+        }
+
+        .historia-imagen img {
+            width: 100%;
+            max-width: 750px; /*  tamaño de la imagen */
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .historia-imagen img:hover {
+            transform: scale(1.00);
+        }
+
+        /* Botón de Instagram */
+        .btn-instagram {
+            display: inline-block;
+            background-color: #000;
+            color: #f4f4f4;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 6px;
+            transition: background 0.3s, transform 0.2s;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+        }
+
+        .btn-instagram:hover {
+            background-color: #000;
+            transform: scale(1.05);
+        }
+</style>
+
+
+{% endblock %}

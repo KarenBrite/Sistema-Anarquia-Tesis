@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4 container-spacing">
+        <h3 class="text-center mb-4 text-muted sticky-top p-2 " style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-pen" style="font-size: 22px;"></i> Editar Cliente
+        </h3>
+        
+        <form action="{% url 'clienteEditar' cliente.id %}" method="post" class="bg-white p-5 rounded shadow-lg">
+            {% csrf_token %}
+            {% if error_message %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ cliente.nombre }}" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" value="{{ cliente.telefono }}" required>
+            </div>
+            <div class="form-group">
+                <label for="tipo_cliente">Tipo de Cliente:</label>
+                <select class="form-control" id="tipo_cliente" name="tipo_cliente">
+                    <option value="C" {% if cliente.tipo_cliente == "C" %}selected{% endif %}>Consumidor Final</option>
+                    <option value="R" {% if cliente.tipo_cliente == "R" %}selected{% endif %}>Responsable Inscripto</option>
+                    <option value="M" {% if cliente.tipo_cliente == "M" %}selected{% endif %}>Monotributista</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="razon_social">Razón Social:</label>
+                <input type="text" class="form-control" id="razon_social" name="razon_social" value="{{ cliente.razon_social }}">
+            </div>
+            <div class="form-group">
+                <label for="direccion">Dirección:</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ cliente.direccion }}">
+            </div>
+            <div class="form-group">
+                <label for="cliente_mayorista">Cliente Mayorista:</label>
+                <input type="checkbox" class="form-check-input" id="cliente_mayorista" name="cliente_mayorista" {% if cliente.cliente_mayorista %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="punto_venta">Punto de Venta:</label>
+                <input type="checkbox" class="form-check-input" id="punto_venta" name="punto_venta" {% if cliente.punto_venta %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="codPostal">Código Postal:</label>
+                <input type="number" class="form-control" id="codPostal" name="codPostal" value="{{ cliente.codPostal }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email }}">
+            </div>
+            <div class="form-group">
+                <label for="instagram">Instagram:</label>
+                <input type="url" class="form-control" id="instagram" name="instagram" value="{{ cliente.instagram }}">
+            </div>
+            <div class="form-group">
+                <label for="provincia">Provincia:</label>
+                <select class="form-control" id="provincia" name="provincia">
+                    <option value="">-- Seleccione una provincia --</option>
+                    {% for provincia in provincias %}
+                    <option value="{{ provincia.id }}" {% if cliente.provincia.id == provincia.id %}selected{% endif %}>{{ provincia.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="d-flex justify-content-center mt-4">
+                <button type="submit" class="btn btn-icon m-2">
+                    <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                </button>
+            </div>
+        </form>
+        <div class="d-flex justify-content-center mt-4">
+            <!-- Botón de Eliminar con confirmación -->
+            <form action="{% url 'clienteEliminar' cliente.id %}" method="post" class="me-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-icon m-2" 
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');">
+                    <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+                </button>
+            </form>
+            <a href="{% url 'clientesLista' %}" class="btn btn-icon m-2">
+                <i class="fa-solid fa-rotate-left"></i>  
+            </a>
+        </div>
+    </div>
+    
+
+{% endblock %}

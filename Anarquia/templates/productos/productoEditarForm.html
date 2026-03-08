@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<div class="container mt-5 mb-5">
+    <h3 class="text-center mb-4 text-muted sticky-top p-2" style="top: 70px; z-index: 1050; font-weight: normal; font-size: 2rem;">
+        <i class="fa-solid fa-pen" style="font-size: 23px;"></i> Editar Producto
+    </h3>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10"> <!-- Aumenté el tamaño del contenedor -->
+            <form action="{% url 'productoEditar' producto.id %}"
+                  method="post" 
+                  enctype="multipart/form-data" 
+                  class="bg-white p-5 rounded shadow-lg">
+                {% csrf_token %}
+
+                <div class="row g-4">
+                    <!-- Columna Izquierda (Imagen y controles) -->
+                    <div class="col-md-4 text-center">
+                        {% if producto.imagen %}
+                            <div class="image-container mb-3">
+                                <img src="{{ producto.imagen.url }}" alt="Imagen del producto" 
+                                     class="img-fluid rounded mb-2">
+                            </div>
+                        {% endif %}
+
+                        <!-- Cargar Imagen con vista previa -->
+                        <div class="form-group mb-3">
+                            <label for="id_imagen" class="form-label" style="color: black; font-weight: bold;">
+                                <i class="fa-solid fa-upload"></i> Cargar Imagen
+                            </label>
+                            <input type="file" class="form-control" id="id_imagen" name="imagen" accept="image/*" onchange="previewImage(event)">
+                            <div id="imagePreview" class="mt-3">
+                                <img id="previewImg" src="#" alt="Vista previa de la imagen" style="display:none; width: 100%; max-height: 300px; object-fit: contain;" />
+                            </div>
+                        </div>
+
+                        {% if form.eliminar_imagen %}
+                            <!-- Eliminar Imagen -->
+                            <div class="form-check mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="form-check">
+                                        {{ form.eliminar_imagen }}
+                                    </div>
+                                    <label class="form-check-label ms-2" for="{{ form.eliminar_imagen.id_for_label }}">
+                                        <i class="fa-solid fa-trash-can" style="color: black;"></i> Eliminar Imagen
+                                    </label>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Columna Derecha (Información del Producto) -->
+                    <div class="col-md-7 ps-4">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                <i class="fa-solid fa-tag"></i> Nombre del Producto
+                            </label>
+                            {{ form.nombre }}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                <i class="fa-solid fa-align-left"></i> Descripción
+                            </label>
+                            {{ form.descripcion }}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.precio_unitario.id_for_label }}" class="form-label">
+                                <i class="fa-solid fa-dollar-sign"></i> Precio Unitario
+                            </label>
+                            {{ form.precio_unitario }}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.stock.id_for_label }}" class="form-label">
+                                <i class="fa-solid fa-boxes-stacked"></i> Stock
+                            </label>
+                            {{ form.stock }}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.destilado.id_for_label }}" class="form-label">
+                                <i class="fa-solid fa-wine-bottle"></i> Destilado
+                            </label>
+                            {{ form.destilado }}
+                        </div>
+
+                        <div class="form-check mb-4">
+                            {{ form.reutilizable }}
+                            <label class="form-check-label" for="{{ form.reutilizable.id_for_label }}">
+                                <i class="fa-solid fa-recycle"></i> ¿Reutilizable?
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="mt-4 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-icon m-2">
+                        <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                    </button>
+                </div>
+            </form>
+                    
+            <!-- Botón de Eliminar con confirmación -->
+            <div class="mt-4 d-flex justify-content-center">
+                <form action="{% url 'productoEliminar' producto.id %}" method="post" class="me-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-icon m-2" 
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                    <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+                </button>
+                </form>
+                <a href="{% url 'productosLista' %}" class="btn btn-icon m-2">
+                    <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+                </a>
+            </div> 
+        </div>
+    </div>
+</div>
+
+<!-- Estilos personalizados -->
+<style>
+    .image-container img {
+        max-width: 100%;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .image-container img:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<script>
+    // Función para mostrar la vista previa de la imagen
+    function previewImage(event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('previewImg');
+            preview.src = e.target.result;
+            preview.style.display = 'block';  // Muestra la imagen previa
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+
+{% endblock %}

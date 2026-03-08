@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+  <div class="container mt-4 container-spacing">
+    <h3 class="text-center mb-4 text-muted sticky-top p-2" style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+      <i class="fa-solid fa-circle-info" style="font-size: 23px;"></i> Detalle Insumo
+    </h3>
+      
+      <div class="bg-white p-5 rounded shadow-lg">
+        <div class="card-body">
+          <h5 class="mb-3">Insumo: {{ insumo.insumo }}</h5>
+          <p><strong>Cantidad:</strong> {{ insumo.cantidad }}</p>
+          <p><strong>Contenido Neto:</strong> {{ insumo.contenido_neto }}</p>
+          <p><strong>Unidad de medida:</strong> {{ insumo.unidad_medida}} </p>
+          <p><strong>Precio:</strong> ${{ insumo.precio }}</p>
+          <p><strong>Fecha de Vencimiento:</strong> {{ insumo.fecha_de_vencimiento }}</p>
+          <p><strong>Proveedor:</strong> {{ insumo.id_proveedor.nombre }}</p>
+          
+        </div>
+      </div>
+  </div>
+
+  <!-- FORMULARIOS PARA EDITAR Y ELIMINAR -->
+  <div class="d-flex justify-content-center mb-4">
+    <!-- Botón de Eliminar con confirmación -->
+    <form action="{% url 'insumoEliminar' insumo.id %}" method="post" class="me-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-icon m-2" 
+                onclick="return confirm('¿Estás seguro de que deseas eliminar este insumo?');">
+            <i class="fa-solid fa-trash"></i> <!-- Ícono de bote de basura -->
+        </button>
+    </form>
+    
+    <!-- Botón para Editar  -->
+    <a href="{% url 'insumoEditar' insumo.id %}" class="btn btn-icon m-2">
+        <i class="fa-solid fa-pen"></i>
+    </a>
+</div>
+
+
+
+{% endblock %}

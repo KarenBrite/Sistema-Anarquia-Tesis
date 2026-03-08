@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+<div class="container mt-4 mb-5">
+    <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-circle-info" style="font-size: 23px;"></i> Detalle Compra
+    </h3>
+    
+    <!-- Información de la compra -->
+    <div class="bg-white p-5 rounded shadow-lg">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Fecha:</strong><span class="text-dark"> {{ compra.fecha }}</span></p>
+            </div>
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Total:</strong><span class="text-success"> {{ compra.total }}</span></p>
+            </div>
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Proveedor:</strong><span class="text-dark"> {{ compra.id_proveedor }}</span></p>
+            </div>
+    </div>
+    
+    <!-- Listado de insumos asociados a la compra -->
+    <h4 class="text-dark mb-3">Detalle de la Compra</h4>
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Insumo</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+                {% if form.id_insumo.value and form.cantidad.value %}
+                    <tr>
+                        <td>{{ form.instance.id_insumo.insumo }}</td>
+                        <td>${{ form.precio_unitario.value }}</td>
+                        <td>{{ form.cantidad.value }}</td>
+                        <td>${{ form.subtotal.value }}</td>
+                        
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+ <!-- Contenedor para el botón de edición -->
+ <div class="d-flex justify-content-center mt-4">
+    <a href="{% url 'compraEditar' compra.id %}" class="btn btn-outline-dark btn-sm shadow-sm px-4 py-2">
+        <i class="fa-solid fa-pencil-alt"></i> Editar Compra
+    </a>
+</div>
+
+<style>
+/* Estilos para mejorar la presentación */
+    .container {
+        max-width: 1200px;
+    }
+    .bg-white {
+        background-color: #ffffff;
+    }
+    .table-bordered {
+        border: 1px solid #ddd;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+    .table-dark th, .table-dark td {
+        background-color: #343a40;
+        color: #fff;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .btn-outline-dark {
+        border: 1px solid #343a40;
+        color: #343a40;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    .btn-outline-dark:hover {
+        background-color: #343a40;
+        color: white;
+    }
+    .shadow-sm {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+{% endblock %}

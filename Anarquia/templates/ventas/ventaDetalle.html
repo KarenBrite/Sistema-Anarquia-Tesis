@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+
+<div class="container mt-4 mb-5">
+    <!-- Título de la página -->
+    <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+        <i class="fa-solid fa-info-circle" style="font-size: 23px;"></i> Detalle de Venta
+    </h3>
+    
+    <!-- Contenedor principal de información de la venta -->
+    <div class="bg-white p-5 rounded shadow-lg">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Fecha:</strong> <span class="text-dark">{{ venta.fecha }}</span></p>
+            </div>
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Total:</strong> <span class="text-success">{{ venta.total }}</span></p>
+            </div>
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Porcentaje descuento:</strong> <span class="text-success">{{ venta.descuento }}</span></p>
+            </div>
+            <div class="col-md-4">
+                <p class="h5 text-muted"><strong>Cliente:</strong> <span class="text-dark">{{ venta.id_cliente }}</span></p>
+            </div>
+        </div>
+        
+        <!-- Listado de productos asociados a la venta -->
+        <h4 class="text-dark mb-3">Detalle de la Venta</h4>
+        <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio Unitario</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                    {% if form.id_producto.value and form.cantidad.value %}
+                        <tr>
+                            <td>{{ form.instance.id_producto.nombre }}</td>
+                            <td>${{ form.precio_unitario.value }}</td>
+                            <td>{{ form.cantidad.value }}</td>
+                            <td>${{ form.subtotal.value }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Contenedor para el botón de edición -->
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{% url 'ventaEditar' venta.id %}" class="btn btn-outline-dark btn-sm shadow-sm px-4 py-2">
+            <i class="fa-solid fa-pencil-alt"></i> Editar Venta
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+<style>
+    /* Estilos para mejorar la presentación */
+    .container {
+        max-width: 1200px;
+    }
+    .bg-white {
+        background-color: #ffffff;
+    }
+    .table-bordered {
+        border: 1px solid #ddd;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+    .table-dark th, .table-dark td {
+        background-color: #343a40;
+        color: #fff;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .btn-outline-dark {
+        border: 1px solid #343a40;
+        color: #343a40;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    .btn-outline-dark:hover {
+        background-color: #343a40;
+        color: white;
+    }
+    .shadow-sm {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>

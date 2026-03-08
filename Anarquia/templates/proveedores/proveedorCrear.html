@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <div class="container mt-4 container-spacing">
+        <h3 class="text-muted mb-4 text-center sticky-top p-2"style="font-weight: normal; font-size: 2rem; top: 70px; z-index: 1050;">
+            <i class="fa-solid fa-user-plus" style="font-size: 23px;"></i> Crear proveedor
+        </h3>
+        <form method="post" class="bg-white p-5 rounded shadow-lg">
+            {% csrf_token %}
+            {% if error_message %}
+            <p style="color:red;">{{ error_message }}</p>
+            {% endif %}
+            <div>
+                <div class="form-group mb-3">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" class="form-control" id="direccion" name="direccion" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+        
+                <div class="d-flex justify-content-center mt-4 ">
+                    <button type="submit" class="btn btn-icon m-2">
+                        <i class="fa-solid fa-floppy-disk"></i>  <!-- Icono más moderno -->
+                    </button>
+                    <a href="{% url 'proveedoresLista' %}" class="btn btn-icon m-2">
+                        <i class="fa-solid fa-rotate-left"></i>  <!-- Icono de cancelar más moderno -->
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}

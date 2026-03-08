@@ -1,0 +1,568 @@
+{% load static django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Bootstrap -->
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+    <!-- SweetAlert2 -->
+    <script src="{% static 'lib/sweetalert2-11.13.3/dist/sweetalert2.all.min.js' %}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.13.3/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+
+    
+    <style>
+        /* General */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            color: #333;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: #000;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 1.5rem;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        /* Botón de menú */
+        .sticky-menu {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 1000;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Menú desplegable */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            display: none;
+            justify-content: flex-start;
+            align-items: flex-start;
+            z-index: 995;
+            padding-top: 80px;
+        }
+
+        .menu-content {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            max-width: 250px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .menu-nav a {
+            display: block;
+            margin: 10px 0;
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .menu-nav a:hover {
+            background: black;
+        }
+
+        /* Botón de login */
+        .btn-custom {
+            background: transparent;
+            border: 2px solid black;
+            color: black;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .btn-custom:hover {
+            background: white;
+            color: black;
+        }
+        
+    </style>
+</head>
+
+
+
+ <!-----ENCABEZADO-->
+ <body>
+    <header>
+        <a href="/" style="text-decoration: none; color: white">
+            <h4>Anarquía Gin</h4>
+        </a>
+        <ul class="nav navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-custom">
+                            {{ request.user }} | Logout
+                        </button>
+                    </form>
+                </li>
+            {% else %}
+                {% block login_button %}
+                <li class="nav-item">
+                    <a class="btn-custom" href="{% url 'login' %}">Login</a>
+                </li>
+                {% endblock %}
+            {% endif %}
+        </ul>
+    </header>
+
+
+    {% block menu %}
+    <!-- BARRA DE NAVEGACION -->
+    {% if user.is_authenticated %}
+    <button id="menu-toggle-btn" class="btn btn-dark sticky-menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="menu-overlay" class="menu-overlay">
+        <div class="menu-content">
+            <nav id="menu-close-btn" class="menu-nav">
+                <a class="nav-link" href="/">Inicio</a>
+                <a class="nav-link" href="/clientes/clientesLista/">Clientes</a>
+                <a class="nav-link" href="/productos/productosLista">Productos</a>
+                <a class="nav-link" href="/ventas/ventasLista/">Venta</a>
+                <a class="nav-link" href="/proveedores/proveedoresLista">Proveedores</a>
+                <a class="nav-link" href="/insumos/insumosLista">Insumos</a>
+                <a class="nav-link" href="/compras/comprasLista/">Compra</a>
+                <a class="nav-link" href="/destilados/destiladosLista">Destilados</a>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    <div class="d-flex flex-column flex-grow-1">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="footer-dark">
+        <div class="footer-container">
+            <div class="footer-left">
+                <img src="{% static 'img/Montana.png' %}" alt="Anarquía Gin" class="footer-logo">
+                <h4 class="footer-title">Anarquía Gin</h4>
+                <p class="footer-phrase">"Una revolución de sabores únicos en tu paladar"</p>
+                <p class="footer-water">Elaborado con agua de vertientes del Río Mina Clavero</p>
+            </div>
+            <div class="footer-right">
+                <h5 class="footer-subtitle">Encontranos en</h5>
+                <div class="footer-icons">
+                    <a href="https://instagram.com/anarquiagin_ar" target="_blank" class="footer-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://wa.me/3544442216" target="_blank" class="footer-icon">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                    <a href="https://www.facebook.com/share/15yNiiSEoX/?mibextid=wwXIfr" target="_blank" class="footer-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                </div>
+                <button class="btn-contactanos" data-bs-toggle="modal" data-bs-target="#contactModal">Contáctanos</button>
+            </div>
+        </div>
+    </footer>
+<!-- Modal de Contacto -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-dark" id="contactModalLabel">Contáctanos</h5>
+                <button type="button" class="custom-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="contactForm" method="POST" action="{% url 'contact_us' %}">
+                    {% csrf_token %}  
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="email" name="correo" placeholder="tuemail@ejemplo.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Enviar</button>
+            
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Evita el envío tradicional del formulario
+
+            let formData = new FormData(this);
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken  // Agregar el token CSRF
+                }
+            })
+            .then(response => response.json())  
+            .then(data => {
+                console.log("Respuesta del servidor:", data);
+
+                if (data.success) {
+                    Swal.fire({
+                        title: "¡Mensaje enviado!",
+                        text: "Nos pondremos en contacto pronto.",
+                        icon: "success",
+                        confirmButtonText: "Cerrar"
+                    }).then(() => {
+                        document.getElementById('contactForm').reset(); // Limpiar el formulario
+                        
+                        // 🔹 Cerrar la ventana modal al presionar "Cerrar"
+                        let modalElement = document.getElementById('contactModal');
+                        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: data.error || "Hubo un problema al enviar el mensaje. Inténtalo nuevamente.",
+                        icon: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error en la petición:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "No se pudo enviar el mensaje. Inténtalo de nuevo más tarde.",
+                    icon: "error",
+                    confirmButtonText: "Cerrar"
+                });
+            });
+        });
+
+
+
+    </script>
+    <style>
+    
+ 
+  /* Estilo Footer */
+.footer-dark {
+    background-color: #000;
+    color: white;
+    padding: 30px 0;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.footer-left, .footer-right {
+    flex: 1;
+    padding: 10px;
+    text-align: left;
+}
+
+.footer-logo {
+    width: 80px;
+}
+
+.footer-title {
+    margin-top: 10px;
+    font-size: 1.5rem;
+}
+
+.footer-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    color: #000;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.footer-icon:hover {
+    background-color: #737461;
+    color: white;
+}
+
+
+
+.btn-contactanos {
+    background: black;
+    color: white;
+    border: 2px solid white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.btn-contactanos:hover {
+    background: white;
+    color: black;
+    border: 2px solid black;
+}
+.custom-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: white; /* Cambia el color si lo necesitas */
+    cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    transition: color 0.3s ease;
+}
+
+.custom-close:hover {
+    color: #737461; /* Cambia el color al pasar el mouse */
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 10px;
+    background-color: #f8f8f8;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #000;
+    color: #000;
+    border-bottom: 2px solid #ddd;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: white !important;
+}
+
+.modal-body .form-label {
+    font-weight: 500;
+    color: #000;
+}
+
+/* Estilo Footer */
+.footer-dark {
+    background-color: #000;
+    color: white;
+    padding: 45px 0; /* Aumenta el padding para más espacio */
+    text-align: center; /* Centrar todo el contenido */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: center; /* Centra los elementos */
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    gap: 40px; /* Más espacio entre elementos */
+}
+
+.footer-left, .footer-right {
+    flex: none;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 25px; /* Aumenta la separación vertical */
+}
+
+.footer-logo {
+    width: 80px;
+    margin-bottom: 15px; /* Más separación con el título */
+}
+
+.footer-title {
+    margin-top: 15px;
+    font-size: 1.6rem;
+}
+
+.footer-icons {
+    display: flex;
+    gap: 20px; /* Más separación entre iconos */
+    justify-content: center;
+}
+
+.footer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: white;
+    color: #000;
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+}
+
+.footer-icon:hover {
+    background-color: #737461;
+    color: white;
+}
+
+.btn-contactanos {
+    background: black;
+    color: white;
+    border: 2px solid white;
+    font-size: 1rem;
+    padding: 12px 24px; /* Botón un poco más grande */
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    margin-top: 30px;
+    display: inline-block;
+}
+
+.btn-contactanos:hover {
+    background: white;
+    color: black;
+    border: 2px solid black;
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px; /* Más espacio en celu */
+    }
+    .footer-left, .footer-right {
+        padding: 20px 0;
+        flex: none;
+    }
+}
+
+    </style>
+
+    <!-- Script para manejar el menú -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const menuBtn = document.getElementById("menu-toggle-btn");
+            const menuOverlay = document.getElementById("menu-overlay");
+            const closeBtn = document.getElementById("menu-close-btn");
+            let menuTimeout; // Variable para almacenar el temporizador
+    
+            function abrirMenu() {
+                menuOverlay.style.display = "block";
+    
+                // Limpiar cualquier temporizador anterior
+                clearTimeout(menuTimeout);
+    
+                // Establecer un temporizador para cerrar el menú después de 10 segundos
+                menuTimeout = setTimeout(() => {
+                    menuOverlay.style.display = "none";
+                }, 10000); // 10000ms = 10 segundos
+            }
+    
+            function cerrarMenu() {
+                menuOverlay.style.display = "none";
+                clearTimeout(menuTimeout); // Evitar que el temporizador cierre el menú si ya fue cerrado manualmente
+            }
+    
+            menuBtn.addEventListener("click", function() {
+                if (menuOverlay.style.display === "block") {
+                    cerrarMenu();
+                } else {
+                    abrirMenu();
+                }
+            });
+    
+            closeBtn.addEventListener("click", cerrarMenu);
+        });
+    </script>
+    
+    
+</body>
