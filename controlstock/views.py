@@ -26,6 +26,22 @@ from django.utils.timezone import make_aware
 
 # Create your views here.
 
+# ==================== FUNCIÓN HELPER PARA VALIDACIÓN DE PERMISOS ====================
+
+def check_write_permission(request):
+    """
+    Valida permisos de escritura (POST, PUT, DELETE) en vistas protegidas.
+    Permitirá GET normal, pero bloqueará cambios si el usuario no es staff.
+    
+    Retorna:
+        - True: Tiene permiso para continuar
+        - False: No tiene permiso, debe redirigir/retornar error
+    """
+    if request.method == 'POST' and not request.user.is_staff:
+        messages.error(request, "🔒 Acceso Denegado: Solo lectura. No tienes permisos para realizar cambios en la base de datos.")
+        return False
+    return True
+
 
 def index(request):
     productos = Producto.objects.all()
@@ -113,6 +129,9 @@ def clienteDetalle(request, pk):
 def clienteEliminar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('clientesLista')
+        
         cliente.delete()
         messages.error(request, "Cliente eliminado con éxito.")
         return redirect('clientesLista')
@@ -120,6 +139,9 @@ def clienteEliminar(request, pk):
 
 def clienteCrear(request):
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('clientesLista')
+        
         nombre = request.POST.get('nombre')
         telefono = request.POST.get('telefono')
         tipo_cliente = request.POST.get('tipo_cliente')
@@ -166,6 +188,9 @@ def clienteEditar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('clientesLista')
+        
         # Si se presionó el botón de eliminar
         if 'eliminar' in request.POST:
             try:
@@ -461,6 +486,13 @@ def ventaCrear(request):
     }
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return render(request, 'ventas/ventaCrearForm.html', {
+                'form': ventaForm(), 
+                'ventaFormset': ventaFormset(queryset=Venta_Producto.objects.none()), 
+                'productos': json.dumps(productos_dict)
+            })
+        
         form = ventaForm(request.POST)
         formset = ventaFormset(request.POST)
 
@@ -518,6 +550,22 @@ def ventaEditar(request, pk):
     
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            form = ventaForm(instance=venta)
+            formset = ventaFormset(instance=venta)
+            productos = Producto.objects.all()
+            productos_dict = {
+                p["id"]: float(p["precio_unitario"])
+                for p in productos.values("id", "precio_unitario")
+            }
+            context = {
+                'form': form, 
+                'venta': venta, 
+                'ventaFormset': formset,
+                'productos': json.dumps(productos_dict)
+            }
+            return render(request, 'ventas/ventaEditarForm.html', context)
+        
         form = ventaForm(request.POST, instance=venta)
         formset = ventaFormset(request.POST, instance=venta)
 
@@ -643,6 +691,9 @@ def productoDetalle(request, pk):
 def productoEliminar(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('productosLista')
+        
         producto.delete()
         messages.error(request, "Producto eliminado con éxito.")
         return redirect('productosLista')
@@ -654,6 +705,10 @@ def productoEditar(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            form = productoForm(instance=producto)
+            return render(request, 'productos/productoEditarForm.html', {'form': form, 'producto': producto})
+        
         form = productoForm(request.POST, request.FILES, instance=producto)
 
         if form.is_valid():
@@ -684,6 +739,9 @@ def productoEditar(request, pk):
     
 def productoCrear(request):
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return render(request, 'productos/productoCrearForm.html', {'form': productoForm()})
+        
         form = productoForm(request.POST,  request.FILES)
         if form.is_valid():
             form.save()
@@ -737,6 +795,9 @@ def proveedorEliminar(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)  # Obtienes el proveedor por su pk
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('proveedoresLista')
+        
         proveedor.delete()  # Llamas al método delete() sobre la instancia
         messages.error(request, "Proveedor eliminado con éxito.")
         return redirect('proveedoresLista')  # Redirigir a la lista de proveedores
@@ -749,6 +810,9 @@ def proveedorCrear(request):
     next_url = request.GET.get('next')  # Capturamos la URL de retorno si existe
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return render(request, 'proveedores/proveedorCrear.html')
+        
         nombre = request.POST.get('nombre')
         telefono = request.POST.get('telefono')
         direccion = request.POST.get('direccion')
@@ -774,6 +838,9 @@ def proveedorEditar(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return render(request, 'proveedores/proveedorEditar.html', {'proveedor': proveedor})
+        
         # Obtener los datos del formulario
         nuevo_nombre = request.POST.get('nombre').strip()
         nuevo_telefono = request.POST.get('telefono').strip()
@@ -923,6 +990,15 @@ def compraDetalle(request, pk):
 def compraCrear(request):
     
     if request.method == 'POST':
+        if not check_write_permission(request):
+            form = compraForm()
+            formset = compraFormset(queryset=Compra_Insumo.objects.none())
+            insumos_iniciales = Compra_Insumo.objects.none()
+            return render(request, 'compras/compraCrearForm.html', {
+                'form': form, 
+                'compraFormset': formset,
+                'insumos_iniciales': insumos_iniciales})
+        
         form = compraForm(request.POST)
         formset = compraFormset(request.POST)
 
@@ -962,6 +1038,11 @@ def compraEditar(request, pk):
     compra = get_object_or_404(Compra, pk=pk)
 
     if request.method == 'POST':
+        if not check_write_permission(request):
+            form = compraForm(instance=compra)
+            formset = compraFormset(instance=compra)
+            return render(request, 'compras/compraEditarForm.html', {'form': form, 'compra': compra, 'compraFormset': formset})
+        
         form = compraForm(request.POST, instance=compra)
         formset = compraFormset(request.POST, instance=compra)
 
@@ -1068,6 +1149,9 @@ def insumoCrear(request):
     form = insumoForm(initial=data)  # Rellenamos el formulario con los datos recuperados
 
     if request.method == "POST":
+        if not check_write_permission(request):
+            return render(request, 'insumos/insumoCrearForm.html', {'form': form})
+        
         form = insumoForm(request.POST)
         if form.is_valid():
             form.save()
@@ -1080,6 +1164,10 @@ def insumoCrear(request):
 def insumoEditar(request, pk):
     insumo = get_object_or_404(Insumo, pk=pk)
     if request.method == "POST":
+        if not check_write_permission(request):
+            form = insumoForm(instance=insumo)
+            return render(request, 'insumos/insumoEditarForm.html', {'form': form})
+        
         form = insumoForm(request.POST, instance=insumo)
         if form.is_valid():
             if form.has_changed():  # Verifica si hubo cambios en el formulario
@@ -1097,6 +1185,9 @@ def insumoEditar(request, pk):
 def insumoEliminar(request, pk):
     producto = get_object_or_404(Insumo, pk=pk)
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('insumosLista')
+        
         producto.delete()
         messages.error(request, "Insumo eliminado con éxito.")
         return redirect('insumosLista')  # Verifica que este nombre coincide con el configurado en urls.py
@@ -1129,6 +1220,9 @@ class DestiladosLista(ListView):
 
 def destiladoCrear(request):
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return render(request, 'destilados/destiladoCrearForm.html', {'form': destiladoForm()})
+        
         form = destiladoForm(request.POST)
         if form.is_valid():
             form.save()  # Guardar el destilado en la base de datos
@@ -1143,6 +1237,10 @@ def destiladoEditar(request, pk):
     destilado = get_object_or_404(Destilado, pk=pk)
     
     if request.method == "POST":
+        if not check_write_permission(request):
+            form = destiladoForm(instance=destilado)
+            return render(request, 'destilados/destiladoEditarForm.html', {'form': form, 'destilado': destilado})
+        
         if 'eliminar' in request.POST:  # Verifica si se hizo clic en el botón de eliminar
             destilado.delete()
             messages.success(request, f'El destilado "{destilado.nombre}" ha sido eliminado correctamente.')
@@ -1165,6 +1263,9 @@ def destiladoEditar(request, pk):
 def destiladoEliminar(request, pk):
     destilado = get_object_or_404(Destilado, pk=pk)
     if request.method == 'POST':
+        if not check_write_permission(request):
+            return redirect('destiladosLista')
+        
         destilado.delete()
         messages.error(request, "Destilado eliminado con éxito.")
         return redirect('destiladosLista')  # Verifica que este nombre coincide con el configurado en urls.py

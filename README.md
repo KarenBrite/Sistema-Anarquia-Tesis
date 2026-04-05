@@ -1,5 +1,7 @@
 # Tesis Final | Práctica Profesionalizante II
 
+![Anarquía Gin](Anarquia/static/img/Front.png)
+
 🍸 Sistema de Gestión - Anarquía Gin
 + Estudiantes: Brite Karen, Robert Lara y Mariana Salazar
 
@@ -38,3 +40,13 @@ python manage.py runserver
 ###### Acceso al sistema
 Abrí tu navegador y navegá a la siguiente URL:
 http://127.0.0.1:8000/
+
+
+###### 👤 Acceso para Evaluación (Modo Invitado)
+Para facilitar la revisión del tribunal sin necesidad de configurar un superusuario manualmente, el sistema cuenta con un perfil de Solo Lectura preconfigurado:
+
+Usuario: invitado
+
+Contraseña: usuario123
+
+Nota de Seguridad: El usuario invitado tiene permisos para navegar por todos los módulos (Stock, Ventas, Insumos, etc.), pero no podrá realizar cambios en la base de datos. Cualquier intento de crear, editar o eliminar registros será bloqueado automáticamente por el backend del sistema, mostrando un mensaje de advertencia.
